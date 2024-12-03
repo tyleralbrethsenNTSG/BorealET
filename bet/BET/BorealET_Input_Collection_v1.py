@@ -61,7 +61,7 @@ ee.Authenticate()
 ee.Initialize(project = 'borealet')
 
 ROI = ee.FeatureCollection('projects/borealet/assets/BorealET_ROI').geometry()
-DAY_NIGHT_THRESHOLD = 1.0   # Threshold for incoming short-wave radiation to determine daytime (w/m2)
+DAY_NIGHT_THRESHOLD = 10.0   # Threshold for incoming short-wave radiation to determine daytime (w/m2)
 
 # Params for BorealET_1.0 are based on Calibration_Results_20240507
 params = {
@@ -92,10 +92,10 @@ def roi_clip(image):
 
 # Create Masks for Daytime and Nighttime based on downwelling shortwave radiation
 def day_mask(image):
-    day_night_threshold = 1.0           # Threshold for incoming short-wave radiation to determine daytime (w/m2)
+    day_night_threshold = DAY_NIGHT_THRESHOLD          # Threshold for incoming short-wave radiation to determine daytime (w/m2)
     return image.gte(day_night_threshold)
 def night_mask(image):
-    day_night_threshold = 1.0           # Threshold for incoming short-wave radiation to determine daytime (w/m2)
+    day_night_threshold = DAY_NIGHT_THRESHOLD           # Threshold for incoming short-wave radiation to determine daytime (w/m2)
     return image.lt(day_night_threshold)
 
 
@@ -315,12 +315,12 @@ def combine_images(annual_temp_image, rad_daytime_image, slv_daytime_image, rad_
 
 # Map over the collections using the combine_images function
 def aggregate_all_inputs(start_date, end_date):
-    annual_temp = aggregate_all_merra2(start_date, end_date, 1.0)['annual_temp'].first()
-    rad_daytime = aggregate_all_merra2(start_date, end_date, 1.0)['rad_daytime']
-    slv_daytime = aggregate_all_merra2(start_date, end_date, 1.0)['slv_daytime']
-    rad_nighttime = aggregate_all_merra2(start_date, end_date, 1.0)['rad_nighttime']
-    slv_nighttime = aggregate_all_merra2(start_date, end_date, 1.0)['slv_nighttime']
-    tmin = aggregate_all_merra2(start_date, end_date, 1.0)['tmin']
+    annual_temp = aggregate_all_merra2(start_date, end_date, DAY_NIGHT_THRESHOLD)['annual_temp'].first()
+    rad_daytime = aggregate_all_merra2(start_date, end_date, DAY_NIGHT_THRESHOLD)['rad_daytime']
+    slv_daytime = aggregate_all_merra2(start_date, end_date, DAY_NIGHT_THRESHOLD)['slv_daytime']
+    rad_nighttime = aggregate_all_merra2(start_date, end_date, DAY_NIGHT_THRESHOLD)['rad_nighttime']
+    slv_nighttime = aggregate_all_merra2(start_date, end_date, DAY_NIGHT_THRESHOLD)['slv_nighttime']
+    tmin = aggregate_all_merra2(start_date, end_date, DAY_NIGHT_THRESHOLD)['tmin']
     albedo_filled = aggregate_albedo(start_date, end_date)
     lai_filled = aggregate_lai(start_date, end_date)
     fpar_filled = aggregate_fpar(start_date, end_date)
